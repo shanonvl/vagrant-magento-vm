@@ -25,15 +25,15 @@ Vagrant.configure("2") do |config|
   # config.vm.network :public_network
 
   # Lucky people can enable nfs but they will get permission errors https://groups.google.com/forum/?fromgroups=#!topic/vagrant-up/-J3UEqYXveA
-  config.vm.synced_folder ".", "/vagrant", :extra => 'dmode=777,fmode=777'
+  config.vm.synced_folder ".", "/vagrant", :mount_options => ['dmode=777','fmode=777']
 
   config.vm.provider :virtualbox do |vb|
-  
+
     # Use VBoxManage to customize the VM. For example to change memory:
     vb.customize ["modifyvm", :id, "--memory", "2048"]
     vb.customize ["modifyvm", :id, "--cpus", "2"]
   end
-  
+
   config.vm.provision :chef_solo do |chef|
     # Specify vagrant cookbooks: our project cookbooks and magento required cookbooks
     chef.cookbooks_path = ["./myrecipes/cookbooks", "./recipes/cookbooks",]
@@ -42,23 +42,24 @@ Vagrant.configure("2") do |config|
     chef.add_recipe "vagrant_magento"
 
     # You may also specify custom JSON attributes:
-    chef.json = { 
+    chef.json = {
         'vagrant_magento' => {
             'config' => {
                 'install' => true,
             },
             'source' => {
-                'version' => 'magento-1.5.1.0',
+                'version' => 'magento-1.7.0.2',
             },
             'sample_data' => {
-                'install' => false, # Not sure what version of sample data can be used and is still available
+                'install' => true,
+                'version' => '1.6.1.0',
             },
             # Sets MAGE_IS_DEVELOPER_MODE (error reporting)
             'mage_dev_enabled' => true,
 
-            # Don't install Magneto Debug (this version needs to be patched to allow template symlinks)
+            # Install Magneto Debug
             'debug' => {
-                'enabled' => false,
+                'enabled' => true,
             }
         },
     }
